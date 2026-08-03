@@ -140,59 +140,14 @@ class DebtViewModel(application: Application) : AndroidViewModel(application) {
             if (id != null) repository.getPaymentsForDebtFlow(id) else flowOf(emptyList())
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-        // Seed initial demo data if database is empty on first launch
-        seedInitialDemoDataIfEmpty()
+        // Clear initial debts as requested by user
+        clearAllDebts()
     }
 
-    private fun seedInitialDemoDataIfEmpty() {
+    fun clearAllDebts() {
         viewModelScope.launch {
-            // Check after small delay if empty
-            if (allActiveDebts.value.isEmpty() && closedDebts.value.isEmpty()) {
-                val now = System.currentTimeMillis()
-                val dayMs = 24 * 60 * 60 * 1000L
-
-                // Debt 1: Owed to me (Alexey)
-                val id1 = repository.createDebt(
-                    personName = "Алексей Смирнов",
-                    type = DebtType.OWED_TO_ME,
-                    amount = 15000.0,
-                    currency = "₽",
-                    dueDate = now + (5 * dayMs),
-                    comment = "На покупку билетов на концерт"
-                )
-                repository.addPartialPayment(id1, 3000.0, "Перевёл первую часть на карту")
-
-                // Debt 2: Owed to me (Marina)
-                repository.createDebt(
-                    personName = "Марина Кравец",
-                    type = DebtType.OWED_TO_ME,
-                    amount = 4500.0,
-                    currency = "₽",
-                    dueDate = now - (2 * dayMs), // Overdue
-                    comment = "Оплата обеда в кафе"
-                )
-
-                // Debt 3: I owe (Dmitry)
-                val id3 = repository.createDebt(
-                    personName = "Дмитрий Волков",
-                    type = DebtType.I_OWE,
-                    amount = 8000.0,
-                    currency = "₽",
-                    dueDate = now + (10 * dayMs),
-                    comment = "Замена резины в автосервисе"
-                )
-                repository.addPartialPayment(id3, 2000.0, "Аванс")
-
-                // Closed debt
-                val id4 = repository.createDebt(
-                    personName = "Елена Соколова",
-                    type = DebtType.OWED_TO_ME,
-                    amount = 5000.0,
-                    currency = "₽",
-                    comment = "Аренда оборудования"
-                )
-                repository.settleInFull(id4, "Закрыто полностью")
-            }
+            repository.clearAllData()
+            selectedDebtId.value = null
         }
     }
 

@@ -124,4 +124,9 @@ class DebtRepository(private val debtDao: DebtDao) {
     suspend fun deleteDebt(debt: Debt) {
         debtDao.deleteDebt(debt)
     }
+
+    suspend fun clearAllData() {
+        debtDao.deleteAllPayments()
+        debtDao.deleteAllDebts()
+    }
 }
