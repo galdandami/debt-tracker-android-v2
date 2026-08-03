@@ -1,0 +1,6 @@
+{
+  "name": "Debt Tracker",
+  "description": "Modern offline debt tracking app with Room database, partial payments, deadlines, and multi-currency support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
