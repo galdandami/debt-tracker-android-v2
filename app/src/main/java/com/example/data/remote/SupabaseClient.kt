@@ -102,7 +102,12 @@ object SupabaseClient {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Auth error", e)
-            Result.failure(e)
+            val friendlyError = if (e is java.net.UnknownHostException || e.message?.contains("Unable to resolve host") == true) {
+                "Не удалось найти адрес хоста Supabase ($supabaseUrl). Проверьте правильность URL в Secrets или нажмите \"Продолжить локально\"."
+            } else {
+                e.message ?: "Ошибка подключения к серверу."
+            }
+            Result.failure(Exception(friendlyError))
         }
     }
 
