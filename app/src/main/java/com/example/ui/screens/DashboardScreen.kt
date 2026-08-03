@@ -30,6 +30,9 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DropdownMenu
@@ -46,6 +49,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -88,6 +92,7 @@ fun DashboardScreen(
     var isSearching by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showUserMenu by remember { mutableStateOf(false) }
+    var showWebPortalDialog by remember { mutableStateOf(false) }
 
 
     Scaffold(
@@ -216,6 +221,25 @@ fun DashboardScreen(
                             )
 
                             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Language,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Веб-версия & Калькулятор")
+                                    }
+                                },
+                                onClick = {
+                                    showUserMenu = false
+                                    showWebPortalDialog = true
+                                }
+                            )
 
                             DropdownMenuItem(
                                 text = {
@@ -359,5 +383,31 @@ fun DashboardScreen(
                 }
             }
         }
+    }
+
+    if (showWebPortalDialog) {
+        AlertDialog(
+            onDismissRequest = { showWebPortalDialog = false },
+            icon = { Icon(imageVector = Icons.Default.Language, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+            title = { Text("Веб-сайт & Калькулятор долгов", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        text = "Веб-версия приложения доступна в репозитории в папке /web/index.html и поддерживает полноценную синхронизацию с этим Android приложением через Supabase.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Возможности сайта:\n• Калькулятор рассрочки и процентов\n• Калькулятор деления чека\n• Авто-синхронизация с Android приложением\n• Режим работы Offline / Online",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showWebPortalDialog = false }) {
+                    Text("Понятно")
+                }
+            }
+        )
     }
 }
