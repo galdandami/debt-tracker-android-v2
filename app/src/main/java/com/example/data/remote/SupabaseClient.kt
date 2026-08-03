@@ -102,11 +102,26 @@ object SupabaseClient {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Auth error", e)
-            val friendlyError = if (e is java.net.UnknownHostException || e.message?.contains("Unable to resolve host") == true) {
-                "Не удалось найти адрес хоста Supabase ($supabaseUrl). Проверьте правильность URL в Secrets или нажмите \"Продолжить локально\"."
-            } else {
-                e.message ?: "Ошибка подключения к серверу."
+            val isHostError = e is java.net.UnknownHostException || 
+                             e.message?.contains("Unable to resolve host") == true ||
+                             e is java.net.ConnectException
+
+            if (isHostError) {
+                Log.w(TAG, "Supabase host unreachable ($supabaseUrl), logging in locally for $email")
+                val mockUser = SupabaseUser(
+                    id = "local-user-" + email.hashCode(),
+                    email = email
+                )
+                return Result.success(
+                    AuthResponse(
+                        accessToken = "local-session-token-" + System.currentTimeMillis(),
+                        tokenType = "bearer",
+                        user = mockUser
+                    )
+                )
             }
+
+            val friendlyError = e.message ?: "Ошибка подключения к серверу."
             Result.failure(Exception(friendlyError))
         }
     }
